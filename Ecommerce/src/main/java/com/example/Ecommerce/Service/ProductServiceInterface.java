@@ -1,8 +1,9 @@
-package com.example.Ecommerce.Service.Product;
+package com.example.Ecommerce.Service;
 
 import java.util.List;
 
 import com.example.Ecommerce.Request.ProductDto;
+import com.example.Ecommerce.Request.ProductUpdateDto;
 import com.example.Ecommerce.model.Product;
 
 public interface ProductServiceInterface {
@@ -11,7 +12,7 @@ public interface ProductServiceInterface {
 	List<Product> getAllProduct();
 	Product getProductById(Long id);
 	void DelteProductById(Long id);
-	void updateProduct(Product product,Long id);
+	Product updateProduct(ProductUpdateDto product,Long id);
 	List<Product> getProductByCategory(String category);
 	List<Product> getProductByBrand(String brand);
 	List<Product> getProductByCategoryAndBrand(String category,String brand);

@@ -1,12 +1,14 @@
-package com.example.Ecommerce.Service.Product;
+package com.example.Ecommerce.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-
 import com.example.Ecommerce.Exception.ProductNotFoundException;
+import com.example.Ecommerce.Repository.CategoryRepository;
 import com.example.Ecommerce.Repository.ProductRepository;
 import com.example.Ecommerce.Request.ProductDto;
+import com.example.Ecommerce.Request.ProductUpdateDto;
 import com.example.Ecommerce.model.Category;
 import com.example.Ecommerce.model.Product;
 
@@ -17,14 +19,26 @@ import lombok.RequiredArgsConstructor;
 public class ProductService implements ProductServiceInterface{
 	
 	private final ProductRepository productRepository;	
+	
+	private final CategoryRepository categoryRepository;
 
 	@Override
 	public Product addProduct(ProductDto product) {
 		//check if category exist in db
-		// if yes, set it else save it as new product category
+		// if yes, set it else save it as new category
+		//then set as the new product category
+		
+		Category category= Optional.ofNullable(categoryRepository.findByName(product.getCategory().getName()))
+				.orElseGet(()->{
+					Category newCategory=new Category(product.getCategory().getName());
+					return categoryRepository.save(newCategory);
+				});
+		product.setCategory(category);
+				
+
 		
 		
-		return null;
+		return productRepository.save(createProduct(product,category));
 	}
 	
 	private Product createProduct(ProductDto product,Category category) {
@@ -63,10 +77,29 @@ public class ProductService implements ProductServiceInterface{
 	}
 
 	@Override
-	public void updateProduct(Product product, Long id) {
-		// TODO Auto-generated method stub
+	public Product updateProduct(ProductUpdateDto product, Long id) {
+		return productRepository.findById(id)
+				.map(existingProduct->updateExistingProduct(existingProduct, product))
+				.map(productRepository::save)
+				.orElseThrow(()-> new ProductNotFoundException("Product not found"));
 		
 	}
+	
+	private Product updateExistingProduct(Product existingProduct,ProductUpdateDto product) {
+	    existingProduct.setName(product.getName());
+	    existingProduct.setBrand(product.getBrand());
+	    existingProduct.setPrice(product.getPrice());
+	    existingProduct.setInventory(product.getInventory());
+	    existingProduct.setDescription(product.getDescription());
+	    
+	    Category category =  categoryRepository.findByName(product.getCategory().name());
+	    existingProduct.setCategory(category);
+	    return existingProduct;
+		
+	}
+	
+	
+	
 
 	@Override
 	public List<Product> getProductByCategory(String category) {
