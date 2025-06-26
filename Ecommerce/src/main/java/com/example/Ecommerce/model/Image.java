@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,6 +27,10 @@ public class Image {
 	private Long id;
 	private String fileName;
 	private String fileType;
+	
+	@Lob // it tells This field may contain large binary data, 
+	//so store it as a LOB (Large Object Binary) in the database.”
+	
 	private Blob image;
 	private String downloadUrl;
 	
