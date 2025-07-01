@@ -7,8 +7,10 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import com.example.Ecommerce.Exception.CategoryAlredyExistException;
 import com.example.Ecommerce.Exception.CategoryNotFoundException;
+import com.example.Ecommerce.Mapper.CategoryMapper;
 import com.example.Ecommerce.Repository.CategoryRepository;
 import com.example.Ecommerce.Request.CategoryDto;
+import com.example.Ecommerce.Request.CategoryUpdateDto;
 import com.example.Ecommerce.model.Category;
 
 import lombok.RequiredArgsConstructor;
@@ -19,50 +21,54 @@ import lombok.RequiredArgsConstructor;
 public class CategoryService implements CategoryServiceInterface{
 	
 	private final CategoryRepository categoryRepository;
-
-	@Override
-	public Category getCategoryByid(Long id) {
-		return categoryRepository.findById(id)
-				.orElseThrow(()->new CategoryNotFoundException("Category Dosent Exist with id"+id));
 	
+	private final CategoryMapper categorymapper;
+
+	@Override
+	public CategoryDto getCategoryByid(Long id) {
+		Category category = categoryRepository.findById(id)
+				.orElseThrow(()->new CategoryNotFoundException("Category Dosent Exist with id"+id));
+		return categorymapper.toDto(category);
 	}
 
 	@Override
-	public Category getCategoryByName(String name) {
-		return categoryRepository.findByName(name);
-				
+	public CategoryDto getCategoryByName(String name) {
+		 Category category = Optional.ofNullable(categoryRepository.findByName(name))
+			        .orElseThrow(() -> new CategoryNotFoundException("Category not found with name " + name));
+			    return categorymapper.toDto(category);
 	}
-
+	
 	@Override
-	public List<Category> getAllCategory() {
-		return categoryRepository.findAll();
+	public List<CategoryDto> getAllCategory() {
+		List<Category> categories = categoryRepository.findAll();
+		return categorymapper.toDtoList(categories);
 	}
-
-
-
+	
 	@Override
 	public void deleteCategoryByid(Long id) {
 		categoryRepository.findById(id).ifPresentOrElse(categoryRepository::delete,()->{
 			throw new CategoryNotFoundException("Category Not found");
 		});
-		
-		
 	}
-
+	
 	@Override
-	public Category addCategory(CategoryDto categoryDto) {
-		 if (categoryRepository.existsByName(categoryDto.getName())) {
-		        throw new CategoryAlredyExistException("Category already exists");
-		    }
-		    Category category = new Category(categoryDto.getName());
-		    return categoryRepository.save(category);
-	}		    
-
+	public CategoryDto addCategory(CategoryDto categoryDto) {
+		if (categoryRepository.existsByName(categoryDto.getName())) {
+			throw new CategoryAlredyExistException("Category already exists");
+		}
+		Category category = categorymapper.toEntity(categoryDto);
+		Category savedCategory = categoryRepository.save(category);
+		return categorymapper.toDto(savedCategory);
+	}
+	
 	@Override
-	public Category updateCategory(CategoryDto categoryDto, Long id) {
-		Category existingCategory = getCategoryByid(id); // throws if not found
-	    existingCategory.setName(categoryDto.getName());
-	    return categoryRepository.save(existingCategory);
+	public CategoryDto updateCategory(CategoryUpdateDto categoryupdateDto, Long id) {
+		Category existingCategory = categoryRepository.findById(id)
+				.orElseThrow(()->new CategoryNotFoundException("Category Dosent Exist with id"+id));
+		
+		 existingCategory.setName(categoryupdateDto.getName());
+		Category updatedCategory = categoryRepository.save(existingCategory);
+		return categorymapper.toDto(updatedCategory);
 	}
 
 }

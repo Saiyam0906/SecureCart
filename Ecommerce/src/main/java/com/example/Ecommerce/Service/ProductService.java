@@ -2,7 +2,6 @@ package com.example.Ecommerce.Service;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 import com.example.Ecommerce.Exception.ProductNotFoundException;
 import com.example.Ecommerce.Mapper.ProductMapper;
@@ -27,21 +26,21 @@ public class ProductService implements ProductServiceInterface{
 
 	@Override
 	public ProductDto addProduct(ProductDto productDto) {
-		//check if category exist in db
-		// if yes, set it else save it as new category
-		//then set as the new product category
+		// Handle category creation if needed
+		if (productDto.getCategory() != null && productDto.getCategory().getName() != null) {
+			Category category = Optional.ofNullable(categoryRepository.findByName(productDto.getCategory().getName()))
+					.orElseGet(() -> {
+						Category newCategory = new Category(productDto.getCategory().getName());
+						return categoryRepository.save(newCategory);
+					});
+			// Update the DTO with the saved category (including ID)
+			productDto.getCategory().setId(category.getId());
+		}
 		
-		Category category= Optional.ofNullable(categoryRepository.findByName(productDto.getCategory().getName()))
-				.orElseGet(()->{
-					Category newCategory=new Category(productDto.getCategory().getName());
-					return categoryRepository.save(newCategory);
-				});
-		
-		Product productentity=productmapper.toEntity(productDto);
-		productentity.setCategory(category);
-		Product saveproduct=productRepository.save(productentity);
+		// Let MapStruct handle the full mapping including category
+		Product productentity = productmapper.toEntity(productDto);
+		Product saveproduct = productRepository.save(productentity);
 		return productmapper.toDto(saveproduct);
-			
 	}
 	
 
@@ -70,28 +69,32 @@ public class ProductService implements ProductServiceInterface{
 	}
 
 	@Override
-	public ProductDto updateProduct(ProductUpdateDto product, Long id) {
-		Product updateproduct=productRepository.findById(id)
-				.map(e-> updateExistingProduct(e, product))
-				.map(productRepository::save)
-				.orElseThrow(()-> new ProductNotFoundException("Product not found"));
+	public ProductDto updateProduct(ProductUpdateDto productUpdateDto, Long id) {
+		// Step 1: Find the existing product
+		Product existingProduct = productRepository.findById(id)
+				.orElseThrow(() -> new ProductNotFoundException("Product not found"));
 		
-		return productmapper.toDto(updateproduct);
-	}
-	
-	private Product updateExistingProduct(Product existingProduct,ProductUpdateDto product) {
-	    existingProduct.setName(product.getName());
-	    existingProduct.setBrand(product.getBrand());
-	    existingProduct.setPrice(product.getPrice());
-	    existingProduct.setInventory(product.getInventory());
-	    existingProduct.setDescription(product.getDescription());
-	    
-	    Category category =  categoryRepository.findByName(product.getCategory().name());
-	    existingProduct.setCategory(category);
-	    return existingProduct;
+		// Step 2: Manually update each field
+		existingProduct.setName(productUpdateDto.getName());
+		existingProduct.setBrand(productUpdateDto.getBrand());
+		existingProduct.setPrice(productUpdateDto.getPrice());
+		existingProduct.setInventory(productUpdateDto.getInventory());
+		existingProduct.setDescription(productUpdateDto.getDescription());
 		
+		// Step 3: Handle category update
+		if (productUpdateDto.getCategory() != null && productUpdateDto.getCategory().getName() != null) {
+			Category category = Optional.ofNullable(categoryRepository.findByName(productUpdateDto.getCategory().getName()))
+					.orElseGet(() -> {
+						Category newCategory = new Category(productUpdateDto.getCategory().getName());
+						return categoryRepository.save(newCategory);
+					});
+			existingProduct.setCategory(category);
+		}
+		
+		// Step 4: Save and return
+		Product updatedProduct = productRepository.save(existingProduct);
+		return productmapper.toDto(updatedProduct);
 	}
-	
 	
 	
 

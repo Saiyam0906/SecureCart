@@ -17,7 +17,7 @@ public class ProductDto {
      private String description;
      private float price;
      private int inventory;
-     private Category category;
+     private CategoryDto category;
      
 
 }
