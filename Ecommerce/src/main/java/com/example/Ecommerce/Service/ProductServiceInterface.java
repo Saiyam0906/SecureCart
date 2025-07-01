@@ -8,16 +8,16 @@ import com.example.Ecommerce.model.Product;
 
 public interface ProductServiceInterface {
 	
-	Product addProduct(ProductDto product);
-	List<Product> getAllProduct();
-	Product getProductById(Long id);
+	ProductDto addProduct(ProductDto productDto);
+	List<ProductDto> getAllProduct();
+	ProductDto getProductById(Long id);
 	void DelteProductById(Long id);
-	Product updateProduct(ProductUpdateDto product,Long id);
-	List<Product> getProductByCategory(String category);
-	List<Product> getProductByBrand(String brand);
-	List<Product> getProductByCategoryAndBrand(String category,String brand);
-	List<Product> getProductByName(String name);
-	List<Product> getProductByBrandAndName(String brand,String name);
+	ProductDto updateProduct(ProductUpdateDto product,Long id);
+	List<ProductDto> getProductByCategory(String category);
+	List<ProductDto> getProductByBrand(String brand);
+	List<ProductDto> getProductByCategoryAndBrand(String category,String brand);
+	List<ProductDto> getProductByName(String name);
+	List<ProductDto> getProductByBrandAndName(String brand,String name);
 	Long countProductByBrandAndName(String brand,String name);
 	
 	
