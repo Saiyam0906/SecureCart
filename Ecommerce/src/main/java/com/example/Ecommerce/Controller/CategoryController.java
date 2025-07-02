@@ -26,7 +26,7 @@ public class CategoryController {
 	private final CategoryService categoryservice;
 	
 	@GetMapping("/Categories")
-	private ResponseEntity<ApiResponse> getAllCategories(){
+	public ResponseEntity<ApiResponse> getAllCategories(){
 		try {
 			
 			List<CategoryDto> category=categoryservice.getAllCategory();
@@ -38,7 +38,7 @@ public class CategoryController {
 	}
 	
 	@PostMapping("/addCategory")
-	private ResponseEntity<ApiResponse> addCategory(@RequestBody CategoryDto categoryDto){
+	public ResponseEntity<ApiResponse> addCategory(@RequestBody CategoryDto categoryDto){
 		try {
 			CategoryDto category = categoryservice.addCategory(categoryDto);
 			 return ResponseEntity.status(HttpStatus.CREATED)
@@ -50,7 +50,7 @@ public class CategoryController {
 	}
 	
 	@GetMapping("/Category/{id}")
-	private ResponseEntity<ApiResponse> getCategoryById(@PathVariable Long id){
+	public ResponseEntity<ApiResponse> getCategoryById(@PathVariable Long id){
 		try {
 			CategoryDto category=categoryservice.getCategoryByid(id);
 			return ResponseEntity.ok(new ApiResponse("Category Found", category));
@@ -60,7 +60,7 @@ public class CategoryController {
 	}
 	
 	@GetMapping("/Name/{name}")
-	private ResponseEntity<ApiResponse> getCategoryByName(@PathVariable String name){
+	public ResponseEntity<ApiResponse> getCategoryByName(@PathVariable String name){
 		try {
 			CategoryDto category=categoryservice.getCategoryByName(name);
 			return ResponseEntity.ok(new ApiResponse("Category Found", category));
@@ -70,7 +70,7 @@ public class CategoryController {
 	}
 	
 	@GetMapping("/Categories/{id}")
-	private ResponseEntity<ApiResponse> DeleteCategory(@PathVariable Long id){
+	public ResponseEntity<ApiResponse> DeleteCategory(@PathVariable Long id){
 		try {
 			categoryservice.deleteCategoryByid(id);
 			return ResponseEntity.ok(new ApiResponse("Category Deleted", null));
@@ -80,7 +80,7 @@ public class CategoryController {
 	}
 	
 	@PutMapping("/UpdateCategory/{id}")
-	private ResponseEntity<ApiResponse> UpdateCategory(@PathVariable Long id,@RequestBody CategoryUpdateDto categoryupdateDto){
+	public ResponseEntity<ApiResponse> UpdateCategory(@PathVariable Long id,@RequestBody CategoryUpdateDto categoryupdateDto){
 		try {
 			CategoryDto updateCategory=categoryservice.updateCategory(categoryupdateDto, id);
 			return ResponseEntity.ok(new ApiResponse("Category Update", updateCategory));

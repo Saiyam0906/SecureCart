@@ -42,11 +42,20 @@ public class ImageController {
 	     }
 	}
 	
+	//Add blob data to ImageDto (not recommended for memory reasons)
+	// Create a separate method in service to get blob data
+	
+	//        you create a separate method in service:
+			// byte[] imageData = imageservice.getImageBlobById(imageId);
+	
 	@GetMapping("/downloads/{imageId}")
 	public ResponseEntity<Resource> downloadImage(@PathVariable Long imageId) throws SQLException{
-			Image image=imageservice.getImageById(imageId);
+		try {
 			
-			  byte[] data = image.getImage().getBytes(1, (int) image.getImage().length());
+			Image image=imageservice.getImageMetadataById(imageId);
+			
+			byte[] data = imageservice.getImageBlobById(imageId);
+			
 			    Resource resource = new ByteArrayResource(data);
 			
 
@@ -54,14 +63,19 @@ public class ImageController {
 		        		.contentType(MediaType.parseMediaType(image.getFileType()))
 		                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + image.getFileName() + "\"")
 		                .body(resource);
+		}catch (Exception e) {
+			 return ResponseEntity.status(HttpStatus.NOT_FOUND)
+		                .body(null);
 		}
+	}
 	
 	@PutMapping("/update/{imageId}")
 	public ResponseEntity<ApiResponse> updateImage(@PathVariable Long imageId,@RequestParam MultipartFile file){
 		try {
-		Image image=imageservice.getImageById(imageId);
+		ImageDto image=imageservice.getImageById(imageId);
 		if(image!=null) {
 			imageservice.updateImage(file, imageId);
+			ImageDto updatedImageDto = imageservice.getImageById(imageId);
 			return ResponseEntity.ok(new ApiResponse("Image updated Successfully", image));
 		}else {
 			  return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -76,7 +90,7 @@ public class ImageController {
 	@PutMapping("/delete/{imageId}")
 	public ResponseEntity<ApiResponse> DeleteImage(@PathVariable Long imageId){
 		try {
-		Image image=imageservice.getImageById(imageId);
+		ImageDto image=imageservice.getImageById(imageId);
 		if(image!=null) {
 			imageservice.deleteImageById(imageId);
 			return ResponseEntity.ok(new ApiResponse("Image updated Successfully", image));

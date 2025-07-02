@@ -106,13 +106,13 @@ public class ProductService implements ProductServiceInterface{
 
 	@Override
 	public List<ProductDto> getProductByBrand(String brand) {
-		List<Product> products = productRepository.findByBrandName(brand);
+		List<Product> products = productRepository.findByBrand(brand);
 		return productmapper.toDtoList(products);
 	}
 
 	@Override
 	public List<ProductDto> getProductByCategoryAndBrand(String category, String brand) {
-		List<Product> products = productRepository.findByCategoryAndBrand(category,brand);
+		List<Product> products = productRepository.findByCategory_NameAndBrand(category,brand);
 		return productmapper.toDtoList(products);
 	}
 

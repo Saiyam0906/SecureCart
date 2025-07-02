@@ -9,7 +9,7 @@ import com.example.Ecommerce.model.Image;
 
 public interface ImageInterface {
 	
-       Image getImageById(Long id);
+       ImageDto getImageById(Long id);
        void deleteImageById(Long id);
        List<ImageDto> saveImage(List<MultipartFile> files,Long productId);
        void updateImage(MultipartFile file,Long imageId);
