@@ -1,6 +1,7 @@
 package com.example.Ecommerce.model;
 
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -30,7 +31,7 @@ public class Product {
       private String name;
       private String brand;
       private String description;
-      private float price;
+      private BigDecimal price;
       private int inventory;
       
       @ManyToOne
@@ -40,16 +41,7 @@ public class Product {
       @OneToMany(mappedBy = "product",cascade = CascadeType.ALL,orphanRemoval = true)
       private List<Image> images;
 
-	public Product(String name, String brand, String description, float price, int inventory, Category category) {
-		super();
-		this.name = name;
-		this.brand = brand;
-		this.description = description;
-		this.price = price;
-		this.inventory = inventory;
-		this.category = category;
-	}
-      
+	
       
       
       

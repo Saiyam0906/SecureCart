@@ -1,5 +1,7 @@
 package com.example.Ecommerce.Request;
 
+import java.math.BigDecimal;
+
 import com.example.Ecommerce.model.Category;
 
 import jakarta.persistence.JoinColumn;
@@ -15,7 +17,7 @@ public class ProductDto {
 	 private String name;
      private String brand;
      private String description;
-     private float price;
+     private BigDecimal price;
      private int inventory;
      private CategoryDto category;
      
