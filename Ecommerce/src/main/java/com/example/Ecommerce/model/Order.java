@@ -1,10 +1,17 @@
 package com.example.Ecommerce.model;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
+import com.example.Ecommerce.enums.OrderStatus;
+
+import jakarta.annotation.Generated;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,37 +19,41 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Entity
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-@Entity
-public class Cart {
+@AllArgsConstructor
+@Builder
+@Table(name="orders")
+public class Order {
+   
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private int id;
+	private LocalDate orderDate;
+	private BigDecimal totalAmount;
 	
-	@NotNull(message = "Total amount cannot be null")
-	private BigDecimal totalAmount=BigDecimal.ZERO;
-	
-	@OneToMany(mappedBy = "cart",cascade = CascadeType.ALL,orphanRemoval = true)
-	private Set<CartItem> cartItems;
+	@Enumerated(EnumType.STRING)
+	private OrderStatus orderStatus;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-	public int getTotalItems() {
-        return cartItems != null ? cartItems.size() : 0;
-    }
-
-    public boolean isEmpty() {
-        return cartItems == null || cartItems.isEmpty();
-    }
+	
+	@OneToMany(mappedBy = "order",cascade = CascadeType.ALL,orphanRemoval = true)
+	private Set<OrderItem> orderItems=new HashSet<OrderItem>();
+	
+	
+	
+	
+	
+	
 }

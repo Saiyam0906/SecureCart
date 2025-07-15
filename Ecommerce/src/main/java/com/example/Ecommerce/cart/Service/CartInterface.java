@@ -1,4 +1,4 @@
-package com.example.Ecommerce.Service;
+package com.example.Ecommerce.cart.Service;
 
 import java.math.BigDecimal;
 
@@ -7,9 +7,9 @@ import com.example.Ecommerce.model.Cart;
 
 public interface CartInterface {
 	
-	CartDto getCart(Long id);
-	void clearCart(Long id);
-	BigDecimal getTotalPrice(Long id);
+	CartDto getCart(Long userid);
+	CartDto clearCart(Long userid);
+	BigDecimal getTotalPrice(Long userid);
 	
 	
 

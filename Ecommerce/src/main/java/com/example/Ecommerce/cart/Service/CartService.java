@@ -1,4 +1,4 @@
-package com.example.Ecommerce.Service;
+package com.example.Ecommerce.cart.Service;
 
 import java.math.BigDecimal;
 
@@ -24,8 +24,8 @@ public class CartService implements CartInterface{
 	private final CartMapper cartmapper;
 	
 	@Override
-	public CartDto getCart(Long id) {
-	Cart cart=cartrepository.findById(id)
+	public CartDto getCart(Long userid) {
+	Cart cart=cartrepository.findByUser_Id(userid)
 			.orElseThrow(()-> new CartNotFoundException("Cart Not found"));
 	
         cart.setTotalAmount(calculateTotalAmount(cart));
@@ -33,13 +33,15 @@ public class CartService implements CartInterface{
 	}
 
 	@Override
-	public void clearCart(Long id) {
-		Cart cart=cartrepository.findById(id)
+	public CartDto clearCart(Long userid) {
+		Cart cart=cartrepository.findByUser_Id(userid)
 				.orElseThrow(()-> new CartNotFoundException("Cart Not found"));
 		
-		cartitemrepository.deleteAllByCartId(id);
-		cart.setTotalAmount(BigDecimal.ZERO);
+		cartitemrepository.deleteAllByCartId(userid);
+		cart.setTotalAmount(calculateTotalAmount(cart));
 		cartrepository.save(cart);
+		
+		return cartmapper.toDto(cart);
 	}
 	
 	
@@ -50,8 +52,8 @@ public class CartService implements CartInterface{
 	}
 
 	@Override
-	public BigDecimal getTotalPrice(Long id) {
-		Cart cart=cartrepository.findById(id)
+	public BigDecimal getTotalPrice(Long userid) {
+		Cart cart=cartrepository.findByUser_Id(userid)
 				.orElseThrow(()->new CartNotFoundException("Cart Not found"));
 		
 		return calculateTotalAmount(cart);

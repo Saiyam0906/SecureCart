@@ -1,4 +1,4 @@
-package com.example.Ecommerce.Service;
+package com.example.Ecommerce.cart.Service;
 
 import java.math.BigDecimal;
 import java.util.Optional;
