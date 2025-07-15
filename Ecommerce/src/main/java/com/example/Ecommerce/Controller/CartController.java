@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.Ecommerce.Request.CartDto;
 import com.example.Ecommerce.Response.ApiResponse;
-import com.example.Ecommerce.cart.Service.CartService;
+import com.example.Ecommerce.Service.Cart.CartService;
 import com.example.Ecommerce.model.Cart;
 
 import lombok.RequiredArgsConstructor;

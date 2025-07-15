@@ -15,7 +15,7 @@ import org.springframework.web.service.annotation.PutExchange;
 
 import com.example.Ecommerce.Request.CartItemDto;
 import com.example.Ecommerce.Response.ApiResponse;
-import com.example.Ecommerce.cart.Service.CartItemService;
+import com.example.Ecommerce.Service.Cart.CartItemService;
 
 import lombok.RequiredArgsConstructor;
 

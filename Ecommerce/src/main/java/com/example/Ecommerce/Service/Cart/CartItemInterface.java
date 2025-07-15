@@ -1,4 +1,4 @@
-package com.example.Ecommerce.cart.Service;
+package com.example.Ecommerce.Service.Cart;
 
 import com.example.Ecommerce.Request.CartItemDto;
 import com.example.Ecommerce.model.CartItem;
