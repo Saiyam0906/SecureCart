@@ -30,7 +30,7 @@ public class OrderItem {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Long id;
 	private int quantity;
 	private BigDecimal unitPrice;
 	

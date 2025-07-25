@@ -2,6 +2,9 @@ package com.example.Ecommerce.Service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.example.Ecommerce.Request.OrderDto;
 import com.example.Ecommerce.enums.OrderStatus;
 import com.example.Ecommerce.model.Order;
@@ -10,9 +13,9 @@ public interface OrderInterface {
 	
 	OrderDto placeOrder(Long userId);
 	OrderDto getOrder(Long orderId);
-	List<OrderDto> getUserOrder(Long userId);
+	Page<OrderDto> getUserOrder(Long userId,Pageable pageable);
 	OrderDto updateOrderStatus(Long orderId,OrderStatus orderstatus);
 	void cancelOrder(Long orderId);
-	List<OrderDto> getOrderByStatus(OrderStatus orderstatus);
+	Page<OrderDto> getOrderByStatus(OrderStatus orderstatus,Pageable pageable );
 	
 }

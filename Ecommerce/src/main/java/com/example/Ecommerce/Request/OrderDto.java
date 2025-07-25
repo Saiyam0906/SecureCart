@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class OrderDto {
     
-	private int id;
+	private Long id;
 
     @NotNull(message = "Order date is required")
     private LocalDate orderDate;

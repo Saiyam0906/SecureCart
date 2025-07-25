@@ -26,5 +26,7 @@ public class AddressRequestDto {
     private String zip;
 
     private Long userId;
+    
+    private boolean isDefault;
 
 }

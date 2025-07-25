@@ -22,11 +22,13 @@ public interface OrderItemMapper {
 	
 	@Mapping(target = "order", ignore = true)
 	@Mapping(target = "product", ignore = true)
+	@Mapping(target="id",ignore = true)
 	OrderItem toEntity(OrderItemDto orderItemDTO);
 	 
 	 
 	 @Mapping(target = "order", ignore = true)
 	 @Mapping(target = "product", ignore = true)
+	 @Mapping(target = "id", ignore = true)
 	 void updateOrderItemFromDTO(OrderItemDto orderItemDTO, @MappingTarget OrderItem orderItem);
 	 
 	 List<OrderItemDto> toDTOList(List<OrderItem> orderItems);

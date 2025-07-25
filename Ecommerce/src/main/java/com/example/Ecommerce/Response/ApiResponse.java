@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class ApiResponse {
 	
-	private String messgae;
+	private String message;
 	
 	private Object data;
 

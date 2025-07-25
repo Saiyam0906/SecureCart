@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class OrderItemDto {
     
-	private int id;
+	private Long id;
 
     @NotNull(message = "Quantity is required")
     @Min(value = 1, message = "Quantity must be at least 1")
@@ -29,5 +29,5 @@ public class OrderItemDto {
     
     private String productName;
     
-    private Integer orderId;
+    private Long orderId;
 }

@@ -6,7 +6,10 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class OrderService implements OrderInterface{
 	
 	private final OrderRepository orderRespository;
@@ -43,6 +47,7 @@ public class OrderService implements OrderInterface{
 	
 	
 	@Override
+	@Transactional
 	public OrderDto placeOrder(Long userId) {
 		
 		User user=userRepository.findById(userId)
@@ -92,16 +97,17 @@ public class OrderService implements OrderInterface{
 	}
 
 	@Override
-	public List<OrderDto> getUserOrder(Long userId) {
+	public Page<OrderDto> getUserOrder(Long userId,Pageable pageable) {
 		User user=userRepository.findById(userId)
 				.orElseThrow(()-> new UserNotFound("User Not found with id"+ userId));
 	    
-		List<Order> order=orderRespository.findByUser_Id(userId);
+		Page<Order> order=orderRespository.findByUser_Id(userId,pageable);
 		
-		return orderMapper.toDTOList(order);
+		return order.map(orderMapper::toDTO);
 	}
 
 	@Override
+	@Transactional
 	public OrderDto updateOrderStatus(Long orderId, OrderStatus orderstatus) {
 		Order order=orderRespository.findById(orderId)
 				.orElseThrow(()->new OrderNotFound("Order Not found with id "+orderId));
@@ -116,6 +122,7 @@ public class OrderService implements OrderInterface{
 	
 
 	@Override
+	@Transactional
 	public void cancelOrder(Long orderId) {
 		
 		Order order=orderRespository.findById(orderId)
@@ -132,11 +139,10 @@ public class OrderService implements OrderInterface{
 	}
 
 	@Override
-	public List<OrderDto> getOrderByStatus(OrderStatus orderstatus) {
-		List<Order> order=orderRespository.findByOrderStatus(orderstatus);
-		return order.stream()
-				.map(orderMapper::toDTO)
-				.toList();
+	public Page<OrderDto> getOrderByStatus(OrderStatus orderstatus,Pageable pageable) {
+		
+		Page<Order> order=orderRespository.findByOrderStatus(orderstatus,pageable);
+		return order.map(orderMapper::toDTO);
 	}
 	
 	

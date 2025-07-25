@@ -1,5 +1,6 @@
 package com.example.Ecommerce.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -48,5 +49,7 @@ public class Address {
     @JoinColumn(name = "user_id") 
     private User user;
     
+    @Column(name = "is_default")
+    private boolean isDefault;
     
 }
