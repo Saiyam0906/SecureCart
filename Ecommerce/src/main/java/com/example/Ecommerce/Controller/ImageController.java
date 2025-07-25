@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import com.example.Ecommerce.Request.ImageDto;
 import com.example.Ecommerce.Response.ApiResponse;
-import com.example.Ecommerce.Service.ImageService;
+import com.example.Ecommerce.Service.Image.ImageService;
 import com.example.Ecommerce.model.Image;
 
 import lombok.RequiredArgsConstructor;

@@ -23,7 +23,7 @@ import com.example.Ecommerce.Request.UserRequestDto;
 import com.example.Ecommerce.Response.ApiResponse;
 import com.example.Ecommerce.Response.PageResponse;
 import com.example.Ecommerce.Response.UserResponseDto;
-import com.example.Ecommerce.Service.UserService;
+import com.example.Ecommerce.Service.User.UserService;
 import com.example.Ecommerce.model.User;
 
 import lombok.RequiredArgsConstructor;

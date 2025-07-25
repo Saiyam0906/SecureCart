@@ -25,7 +25,7 @@ import com.example.Ecommerce.Request.AddressRequestDto;
 import com.example.Ecommerce.Response.AddressResponseDto;
 import com.example.Ecommerce.Response.ApiResponse;
 import com.example.Ecommerce.Response.PageResponse;
-import com.example.Ecommerce.Service.AddressService;
+import com.example.Ecommerce.Service.Address.AddressService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
