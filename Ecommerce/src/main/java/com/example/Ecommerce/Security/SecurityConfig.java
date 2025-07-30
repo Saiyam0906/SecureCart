@@ -40,6 +40,7 @@ public class SecurityConfig {
 			.requestMatchers("/api/auth/**").permitAll()
 			.requestMatchers("/admin/**").hasRole("ADMIN")
 			.requestMatchers("/user/**").hasRole("USER")
+			 .requestMatchers("/api/email/**").permitAll()
 			.anyRequest().authenticated()
 			)
 		.authenticationProvider(daoAuthenticationProvider())
