@@ -25,7 +25,7 @@ import com.example.Ecommerce.Exception.UserNotFound;
 import com.example.Ecommerce.Request.OrderDto;
 import com.example.Ecommerce.Response.ApiResponse;
 import com.example.Ecommerce.Response.PageResponse;
-import com.example.Ecommerce.Service.Order.OrderService;
+import com.example.Ecommerce.Service.OrderService;
 import com.example.Ecommerce.enums.OrderStatus;
 
 import lombok.RequiredArgsConstructor;

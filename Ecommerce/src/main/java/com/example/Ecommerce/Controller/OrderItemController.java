@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.Ecommerce.Request.OrderItemDto;
 import com.example.Ecommerce.Response.ApiResponse;
 import com.example.Ecommerce.Response.PageResponse;
-import com.example.Ecommerce.Service.OrderItem.OrderItemService;
+import com.example.Ecommerce.Service.OrderItemService;
 
 import lombok.RequiredArgsConstructor;
 

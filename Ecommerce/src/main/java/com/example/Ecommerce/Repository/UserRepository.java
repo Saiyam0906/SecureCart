@@ -8,7 +8,9 @@ import com.example.Ecommerce.model.User;
 
 public interface UserRepository extends JpaRepository<User, Long>{
       
-	Optional<User> findUserByName(String username);
+	Optional<User> findByFirstName(String username);
 	
-	Optional<User> findByNameAndEmail(String name, String email);
+	Optional<User> findByFirstNameAndEmail(String name, String email);
+
+	Optional<User> findByEmail(String email);
 }

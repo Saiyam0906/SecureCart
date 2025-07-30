@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.Ecommerce.Request.ProductDto;
 import com.example.Ecommerce.Request.ProductUpdateDto;
 import com.example.Ecommerce.Response.ApiResponse;
-import com.example.Ecommerce.Service.Product.ProductService;
+import com.example.Ecommerce.Service.ProductService;
 import com.example.Ecommerce.model.Product;
 import lombok.RequiredArgsConstructor;
 

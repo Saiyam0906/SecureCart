@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.Ecommerce.Request.CategoryDto;
 import com.example.Ecommerce.Request.CategoryUpdateDto;
 import com.example.Ecommerce.Response.ApiResponse;
-import com.example.Ecommerce.Service.Category.CategoryService;
+import com.example.Ecommerce.Service.CategoryService;
 
 import lombok.RequiredArgsConstructor;
 

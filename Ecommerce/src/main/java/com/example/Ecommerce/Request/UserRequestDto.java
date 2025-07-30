@@ -1,5 +1,7 @@
 package com.example.Ecommerce.Request;
 
+import org.hibernate.validator.constraints.Length;
+
 import com.example.Ecommerce.enums.Role;
 
 import jakarta.validation.constraints.Email;
@@ -25,6 +27,9 @@ public class UserRequestDto {
 	    @NotBlank(message = "Password is required")
 	    @Size(min = 3, message = "Password must be at least 3 characters")
 	    private String password;
+	    
+	    @Size(min=10,message="Phone number must be valid")
+	    private String phoneNumber;
 
 	    private Role role;
 

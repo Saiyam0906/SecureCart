@@ -72,12 +72,20 @@ public class User {
 	 private boolean enabled = true;
 
 	 @Column(nullable = false)
-	 private boolean accountNonLocked = true;
+	 private boolean accountLocked = false;
+	 
+	 @Column(name = "failed_attempts", nullable = false)
+	 private int failedAttempts = 0;
+	 
+	 @Column(name = "lock_time")
+	    private LocalDateTime lockTime;
 	 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Address> addresses = new ArrayList<>();
 	 
-
+	@Column(length=10)
+    private String phoneNumber;
+	
 	@CreationTimestamp
 	@Column(updatable = false)
 	private LocalDateTime createdAt;

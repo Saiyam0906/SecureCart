@@ -18,12 +18,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.Ecommerce.Exception.InvalidPasswordException;
 import com.example.Ecommerce.Exception.UserNotFound;
 import com.example.Ecommerce.Request.UserRequestDto;
+import com.example.Ecommerce.Request.UserUpdateDto;
+import com.example.Ecommerce.Request.changePasswordRequestDto;
 import com.example.Ecommerce.Response.ApiResponse;
+import com.example.Ecommerce.Response.ChangePasswordResponseDto;
 import com.example.Ecommerce.Response.PageResponse;
 import com.example.Ecommerce.Response.UserResponseDto;
-import com.example.Ecommerce.Service.User.UserService;
+import com.example.Ecommerce.Service.UserService;
 import com.example.Ecommerce.model.User;
 
 import lombok.RequiredArgsConstructor;
@@ -47,7 +51,7 @@ public class UserController {
 	}
 	
 	@PutMapping("/Update-User/{id}")
-	public ResponseEntity<ApiResponse> UpdateUser(@RequestBody UserRequestDto userDto,@PathVariable Long id){
+	public ResponseEntity<ApiResponse> UpdateUser(@RequestBody UserUpdateDto userDto,@PathVariable Long id){
 		
 		try {
 			UserResponseDto user=userService.updateUser(userDto, id);
@@ -135,6 +139,20 @@ public class UserController {
 		
 		
 	}
+	@PutMapping("/{userId}/change-password")
+    public ResponseEntity<ApiResponse> changePassword(@PathVariable Long userId, @RequestBody changePasswordRequestDto changePasswordRequest) {
+        try {
+            ChangePasswordResponseDto response = userService.changePassword(userId, changePasswordRequest);
+
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse("Password chnaged", response));
+        } catch (UserNotFound ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("user not found",ex));
+        } catch (InvalidPasswordException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("Passoword Invalid",ex));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse("error occured",null));
+        }
+    }
 	
 
 }

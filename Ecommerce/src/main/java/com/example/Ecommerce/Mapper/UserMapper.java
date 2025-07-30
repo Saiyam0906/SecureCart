@@ -7,6 +7,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import com.example.Ecommerce.Request.UserRequestDto;
+import com.example.Ecommerce.Request.UserUpdateDto;
 import com.example.Ecommerce.Response.UserResponseDto;
 import com.example.Ecommerce.model.User;
 
@@ -19,6 +20,6 @@ public interface UserMapper {
 	
 	List<UserResponseDto> toDtoList(List<User> user);
 	
-	void  updateEntityFromDto(UserRequestDto dto,@MappingTarget User user);
+	void  updateEntityFromDto(UserUpdateDto dto,@MappingTarget User user);
 
 }
