@@ -1,0 +1,28 @@
+# spring:
+#   datasource:
+#     url: jdbc:mysql://localhost:3306/ecommerce
+#     username: root
+#     password: Saiyam09
+#     driver-class-name: com.mysql.cj.jdbc.Driver
+#
+#   jpa:
+#     database-platform: org.hibernate.dialect.MySQL8Dialect
+#     hibernate:
+#       ddl-auto: update
+#     show-sql: true
+#
+#   servlet:
+#     multipart:
+#       enabled: true
+#       max-file-size: 500MB
+#       max-request-size: 500MB
+#       file-size-threshold: 1KB
+#
+#   security:
+#     user:
+#       name: admin
+#       password: admin123  
+#
+# myapp:
+#   base:
+#     url: saiyam-api
