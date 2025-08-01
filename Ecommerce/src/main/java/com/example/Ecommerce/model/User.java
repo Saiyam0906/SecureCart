@@ -86,6 +86,24 @@ public class User {
 	@Column(length=10)
     private String phoneNumber;
 	
+	@Column(name = "profile_picture_url")
+	private String profilePictureUrl;
+	
+	@Column(name = "profile_picture_id")
+	private String profilePictureId;
+	
+	@Column(name = "profile_picture_format")
+	private String profilePictureFormat;  
+
+	@Column(name = "profile_picture_type")
+	private String profilePictureType;    
+
+	@Column(nullable = false)
+	private boolean emailVerified = false;
+
+	@Column(name = "last_login")
+	private LocalDateTime lastLogin;
+	
 	@CreationTimestamp
 	@Column(updatable = false)
 	private LocalDateTime createdAt;
