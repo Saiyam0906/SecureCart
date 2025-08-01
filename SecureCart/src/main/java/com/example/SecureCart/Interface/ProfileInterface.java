@@ -13,5 +13,6 @@ public interface ProfileInterface {
 	ProfileResponseDto updateProfile(Long userId, ProfileUpdateDto requestDto);
 	ProfileResponseDto uploadProfilePicture(Long userId,MultipartFile file);
 	void deleteOldProfilePicture(String publicId);
+	boolean isEmailVerified(Long userId);
 	
 }

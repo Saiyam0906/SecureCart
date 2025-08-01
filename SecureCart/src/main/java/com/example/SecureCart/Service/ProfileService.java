@@ -56,6 +56,9 @@ public class ProfileService implements ProfileInterface{
 		User user=userRepository.findById(userId)
 				.orElseThrow(()->new UserNotFound("User with id Not found"+userId));
 		
+		if (!user.isEmailVerified()) {
+            throw new RuntimeException("Please verify your email before updating profile.");
+        }
 		profileMapper.updateUserFromDto(requestDto, user);
 		
 		userRepository.save(user);
@@ -74,7 +77,11 @@ public class ProfileService implements ProfileInterface{
 		try {
 			User user = userRepository.findById(userId)
                     .orElseThrow(() -> new UserNotFound("User with id not found: " + userId)); 
-           
+			
+			 if (!user.isEmailVerified()) {
+		            throw new RuntimeException("Please verify your email before uploading profile picture.");
+		        }
+			 
             if (user.getProfilePictureId() != null) {
                 cloudinaryService.deleteImage(user.getProfilePictureId());
             }
@@ -118,6 +125,17 @@ public class ProfileService implements ProfileInterface{
     public void deleteOldProfilePicture(String publicId) {
         cloudinaryService.deleteImage(publicId);
     }
+	
+	@Override
+    public boolean isEmailVerified(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        return user.isEmailVerified();
+    }
+	
+	
+	
+	
 
 	
 

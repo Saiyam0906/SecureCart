@@ -59,6 +59,15 @@ public class User {
     @Column(unique = true, nullable = false)
 	private String email;
 	
+	@Column(name = "email_verified")
+    private boolean emailVerified = false;
+	
+	@Column(name = "verification_token")
+    private String verificationToken;
+    
+    @Column(name = "token_expiry")
+    private LocalDateTime tokenExpiry;
+	
 	@NotBlank(message = "Password is required")
 	@Size(min = 3, message = "Password must be at least 3 characters")
 	@Column(nullable = false)
@@ -97,9 +106,6 @@ public class User {
 
 	@Column(name = "profile_picture_type")
 	private String profilePictureType;    
-
-	@Column(nullable = false)
-	private boolean emailVerified = false;
 
 	@Column(name = "last_login")
 	private LocalDateTime lastLogin;
