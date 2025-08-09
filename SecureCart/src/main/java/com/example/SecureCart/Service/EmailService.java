@@ -1,8 +1,10 @@
 package com.example.SecureCart.Service;
 
 import java.text.Normalizer.Form;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -11,14 +13,24 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.example.SecureCart.Exception.EmailSendException;
 import com.example.SecureCart.Interface.EmailInterface;
+import com.example.SecureCart.Repository.FailedEmailRepository;
 import com.example.SecureCart.Repository.UserRepository;
+import com.example.SecureCart.Request.EmailStatsDto;
+import com.example.SecureCart.enums.EmailPriority;
+import com.example.SecureCart.enums.EmailStatus;
+import com.example.SecureCart.model.FailedEmail;
 import com.example.SecureCart.model.User;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,6 +42,8 @@ public class EmailService implements EmailInterface{
 	private final JavaMailSender javaMailSender;
 	
 	private final UserRepository userRepository;
+	
+	private final FailedEmailRepository failedEmailRepository;
 
 	 @Value("${spring.mail.username}")
 	 private String fromEmail;
@@ -42,7 +56,7 @@ public class EmailService implements EmailInterface{
 	    public void sendLoginFailureAlert(String email, int failedAttempts, int maxAttempts) {
 	        String subject = "Security Alert: Failed Login Attempt";
 	        String htmlContent = buildLoginFailureEmail(email, failedAttempts, maxAttempts);
-	        sendEmail(email, subject, htmlContent, "Login failure alert");
+	        sendEmail(email, subject, htmlContent, "Login failure alert",EmailPriority.HIGH);
 	    }
 	    
 	    @Async
@@ -50,7 +64,7 @@ public class EmailService implements EmailInterface{
 	    public void sendAccountLockedNotification(String email, long lockDurationMinutes) {
 	        String subject = " Your Account Has Been Locked";
 	        String htmlContent = buildAccountLockedEmail(email, lockDurationMinutes);
-	        sendEmail(email, subject, htmlContent, "Account locked alert");
+	        sendEmail(email, subject, htmlContent, "Account locked alert",EmailPriority.HIGH);
 	    }
 	    
 	    @Async
@@ -58,7 +72,7 @@ public class EmailService implements EmailInterface{
 	    public void sendPasswordChangeConfirmation(String email) {
 	        String subject = "Password Change Confirmation";
 	        String htmlContent = buildPasswordChangeEmail(email);
-	        sendEmail(email, subject, htmlContent, "Password change confirmation");
+	        sendEmail(email, subject, htmlContent, "Password change confirmation",EmailPriority.HIGH);
 	    }
 
 	    @Async
@@ -66,7 +80,7 @@ public class EmailService implements EmailInterface{
 	    public void sendOrderConfirmation(String email, String orderNumber, double totalAmount) {
 	        String subject = "Order Confirmation";
 	        String htmlContent = buildOrderConfirmationEmail(email, orderNumber, totalAmount);
-	        sendEmail(email, subject, htmlContent, "Order confirmation");
+	        sendEmail(email, subject, htmlContent, "Order confirmation",EmailPriority.NORMAL);
 	    }
 	    
 	    @Async
@@ -93,7 +107,7 @@ public class EmailService implements EmailInterface{
 	        String subject = "Verify Your Email Address";
 	        String body=buildsendEmailverificationBody(verificationLink);
 	        
-	        sendEmail(email, subject, body,"verification Email");
+	        sendEmail(email, subject, body,"verification Email",EmailPriority.HIGH);
 	        
 	        
 
@@ -157,8 +171,9 @@ public class EmailService implements EmailInterface{
 	    }
 	    
 	    
-	    
-	 private void sendEmail(String to, String subject, String htmlContent, String logContext) {
+	 @CircuitBreaker(name= "emailService",fallbackMethod = "fallbackSendEmail")
+	 @Retry(name="emailService")
+	 private void sendEmail(String to, String subject, String htmlContent, String logContext, EmailPriority priority) {
 	        try {
 	            MimeMessage message = javaMailSender.createMimeMessage();
 	            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -173,9 +188,141 @@ public class EmailService implements EmailInterface{
 
 	        } catch (Exception e) {
 	            log.error("Failed to send {} to {}", logContext, to, e);
+	            throw new EmailSendException("Failed to send email to ");
+	           
 	        }
 	    }
+	 
+	 public void sendDirectEmail(String to,String subject,String htmlContent) {
+		 try {
+			 MimeMessage message = javaMailSender.createMimeMessage();
+	            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+	            helper.setTo(to);
+	            helper.setFrom(fromEmail);
+	            helper.setSubject(subject);
+	            helper.setText(htmlContent, true);
+	            javaMailSender.send(message);
+	            log.info("Admin alert email sent successfully");
+		 }catch (Exception e) {
+			 log.error("Failed to send admin alert email", e);
+		}
+		 
+	 }
+	 
+	 public void fallbackSendEmail(String to, String subject, String htmlContent, 
+             String logContext,EmailPriority priority ,Exception ex) {
+		 
+		 log.error("Circuit breaker activated. Email service is down. Failed to send {} to {}", logContext, to);
+		 
+		 
+		 storeFailedEmailForRetry(to, subject, htmlContent, logContext, priority,ex.getMessage());
+	 }
+	 
+	 @Transactional
+	public void storeFailedEmailForRetry(String to, String subject, String htmlContent, 
+            String logContext,EmailPriority priority,String ErrorMessage) {
+		
+		 try {
+	            log.warn("Storing failed email for retry: {} to {}", logContext, to);
+	            
+	            FailedEmail failedEmail = new FailedEmail(to, subject, htmlContent, logContext, priority,ErrorMessage);
+	            failedEmailRepository.save(failedEmail);
+	            
+	            log.info("Failed email stored successfully: {} to {}", logContext, to);
+	            
+	        }catch (Exception e) {
+	        	log.error("Failed to store email for retry: {} to {}", logContext, to, e);
+	         
+	        	
+		} 
+		
+	}
+	 
+	 @Scheduled(fixedRate = 300000)
+	 @Transactional
+	 public void retryfailedEmails() {
+		 try {
+			 log.info("Starting retry of failed emails");
+			 
+			 LocalDateTime cutoffTime=LocalDateTime.now().minusMinutes(5);
+			 List<FailedEmail> failedEmails=failedEmailRepository.findRetryableEmailsOlderThan(cutoffTime);
+			 
+			  if (failedEmails.isEmpty()) {
+	                log.debug("No failed emails to retry");
+	                return;
+	            }
+			  
+			  for(FailedEmail failedEmail : failedEmails) {
+				  try {
+					  log.info("Retrying failed email: {} to {}", failedEmail.getLogContext(), failedEmail.getRecipientEmail());
+					  sendDirectEmail(failedEmail.getRecipientEmail(),failedEmail.getSubject(),failedEmail.getHtmlContent());
+					  
+					  failedEmail.markAsProcessed();
+					  failedEmail.setLastRetryAt(LocalDateTime.now());
+					  failedEmailRepository.save(failedEmail);
+					  
+					  log.info("Successfully retried failed email to {}", failedEmail.getRecipientEmail());
+				  }catch (Exception e) {
+						 log.warn("Retry failed for email to {}", failedEmail.getRecipientEmail(), e);
+						 failedEmail.incrementRetryCount();
+		                    failedEmail.setErrorMessage(e.getMessage());
+		                    failedEmailRepository.save(failedEmail);
+		                    
+		                    if (!failedEmail.canRetry()) {
+		                        log.error("Email permanently failed after {} retries: {} to {}", 
+		                                failedEmail.getRetryCount(), failedEmail.getLogContext(), failedEmail.getRecipientEmail());
+		                        failedEmail.setStatus(EmailStatus.FAILED);
+		                        failedEmailRepository.save(failedEmail);
+		                    }
+						 
+					}
+			  }
+				  
+				  
+			  }catch (Exception e) {
+		            log.error("Error during failed email retry process", e);
+		        }
+			  
+		 
+	 }
+	 
+	 @Scheduled(cron = "0 0 2 * * ?")
+	 public void cleanupoldEmails() {
+		 try {
+			 LocalDateTime cutoffDate = LocalDateTime.now().minusDays(7);
+			 
+			 int deletedSent = failedEmailRepository.deleteByStatusAndCreatedAtBefore(EmailStatus.SENT, cutoffDate);
+			 int deletedFailed = failedEmailRepository.deleteByStatusAndCreatedAtBefore(EmailStatus.FAILED, cutoffDate);
+			 
+			 log.info("Cleaned up old processed emails older than {}", cutoffDate);
+		 }catch (Exception e) {
+			 log.error("Error during email cleanup", e);
+			 
+			}
+	 }
+	 
+	 public EmailStatsDto getEmailStats() {
+		 try {
+			 long pendingCount = failedEmailRepository.countByStatus(EmailStatus.PENDING);
+			 long failedCount = failedEmailRepository.countByStatus(EmailStatus.FAILED);
+			 long sentCount = failedEmailRepository.countByStatus(EmailStatus.SENT);
+			 
+			 boolean healthy=true;
+			 if(pendingCount>10) {
+				 log.warn("Email service health degraded: {} pending failed emails", pendingCount);
+				 healthy=false;
+			 }
+			 return new EmailStatsDto(pendingCount, failedCount, sentCount, healthy);
+		 }catch (Exception e) {
+			 log.error("Failed to get email service stats", e);
+	            return new EmailStatsDto(0, 0, 0, false);
+		}
+	 }
 	
+	 
+	 
+	
+	 
 
 	 private String buildsendEmailverificationBody(String verificationLink) {
 		    return "<html>" +
