@@ -88,6 +88,7 @@ public class User {
 	 
 	 @Column(name = "lock_time")
 	    private LocalDateTime lockTime;
+
 	 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Address> addresses = new ArrayList<>();
@@ -123,6 +124,8 @@ public class User {
 	@OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
 	private List<Order> orders=new ArrayList<Order>();
 	
+	
+
 	
 	
 	

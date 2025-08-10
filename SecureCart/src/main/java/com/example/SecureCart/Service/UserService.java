@@ -38,6 +38,8 @@ public class UserService implements UserInterface{
 	
 	private final UserMapper userMapper;
 	
+	private final EmailService emailService;
+	
 	
 	
 	@Override
@@ -164,8 +166,16 @@ public class UserService implements UserInterface{
         
         userRepository.save(user);
         
-        log.info("Password successfully changed for user with id: {}", userId);
         
+        
+        try {
+        	emailService.sendPasswordChangeConfirmation(user.getEmail());
+        	log.info("Password change confirmation email sent to user: {}", user.getEmail());
+        }catch (Exception e) {
+        	log.error("Failed to send password change confirmation email to user: {}", user.getEmail(), e);
+		}
+        
+        log.info("Password successfully changed for user with id: {}", userId);
         return new ChangePasswordResponseDto(
             "Password changed successfully",
             LocalDateTime.now()

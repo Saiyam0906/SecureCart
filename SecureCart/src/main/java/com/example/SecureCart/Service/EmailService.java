@@ -51,6 +51,9 @@ public class EmailService implements EmailInterface{
 	 @Value("${spring.token.expiry.hours}")
 	 private int TOKEN_EXPIRY_HOURS;
 	 
+	 @Value("${spring.passwordReset.token.expiry}")
+	 private int PasswordReset_TOKEN_EXPIRY;
+	 
 	    @Async
 	    @Override
 	    public void sendLoginFailureAlert(String email, int failedAttempts, int maxAttempts) {
@@ -81,6 +84,15 @@ public class EmailService implements EmailInterface{
 	        String subject = "Order Confirmation";
 	        String htmlContent = buildOrderConfirmationEmail(email, orderNumber, totalAmount);
 	        sendEmail(email, subject, htmlContent, "Order confirmation",EmailPriority.NORMAL);
+	    }
+	    
+	    @Async
+	    @Override
+	    public void sendPasswordResetEmail(String email, String firstName, String resetToken) {
+	        String resetLink = "http://localhost:8080/api/auth/reset-password?token=" + resetToken;
+	        String subject = "Password Reset Request";
+	        String body = buildPasswordResetEmailBody(firstName, resetLink);
+	        sendEmail(email, subject, body, "Password reset email", EmailPriority.HIGH);
 	    }
 	    
 	    @Async
@@ -318,6 +330,21 @@ public class EmailService implements EmailInterface{
 	            return new EmailStatsDto(0, 0, 0, false);
 		}
 	 }
+	 
+	 private String buildPasswordResetEmailBody(String firstName, String resetLink) {
+		    return "<html>" +
+		            "<body style='font-family: Arial, sans-serif; line-height:1.6;'>" +
+		            "<h2>Password Reset</h2>" +
+		            "<p>Hello " + firstName + ",</p>" +
+		            "<p>We received a request to reset your password. Click the link below to set a new one:</p>" +
+		            "<p><a href='" + resetLink + "' " +
+		            "style='display:inline-block;padding:10px 20px;background-color:#4CAF50;color:white;text-decoration:none;border-radius:5px;'>" +
+		            "Reset Password</a></p>" +
+		            "<p>If you didn’t request a password reset, you can safely ignore this email.</p>" +
+		            "<p><small>This link will expire in " + PasswordReset_TOKEN_EXPIRY + " hours.</small></p>" +
+		            "</body>" +
+		            "</html>";
+		}
 	
 	 
 	 

@@ -9,4 +9,5 @@ public interface EmailInterface {
     boolean verifyEmail(String token);
     boolean isEmailVerified(String email);
     void resendVerificationEmail(String email);
+	void sendPasswordResetEmail(String email, String firstName, String resetToken);
 }
