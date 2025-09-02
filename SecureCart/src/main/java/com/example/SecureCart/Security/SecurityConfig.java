@@ -20,6 +20,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,8 +32,10 @@ public class SecurityConfig {
     
 	private final CustomUserDetail customUserDetail;
 	
+	private final JwtFilter jwtFilter;
+	
 	@Bean
-	public SecurityFilterChain securityfilter(HttpSecurity http)throws Exception {
+	public SecurityFilterChain securityfilter(final HttpSecurity http)throws Exception {
 		http
 		.csrf(c->c.disable())
 		.sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -44,12 +47,15 @@ public class SecurityConfig {
 			.anyRequest().authenticated()
 			)
 		.authenticationProvider(daoAuthenticationProvider())
+		.addFilterBefore(this.jwtFilter,UsernamePasswordAuthenticationFilter.class )
 		.exceptionHandling(e -> e.authenticationEntryPoint(authenticationEntryPoint()));
 		
 		return http.build();
 		
 		
 	}	
+	
+	
 	
 	@Bean
 	public DaoAuthenticationProvider daoAuthenticationProvider() {
