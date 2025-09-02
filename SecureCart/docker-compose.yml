@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      # Database connection (points to 'db' service)
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/ecommerce
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      # Mail configuration
+      - SPRING_MAIL_USERNAME=saiyambathla1@gmail.com
+      - SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD}
+      # Cloudinary config
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      # Base URL
+      - MYAPP_BASE_URL=${myapp_base_url}
+    depends_on:
+      - db
+    restart: unless-stopped
+    env_file:
+      - .env
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ecommerce
+    ports:
+      - "3307:3306"
+    volumes:
+      - ecommerce_data:/var/lib/mysql
+    restart: unless-stopped
+    env_file:
+      - .env
+
+volumes:
+  ecommerce_data:
