@@ -13,6 +13,8 @@ import com.example.SecureCart.Cloudinary.ClaudinaryResult;
 import com.example.SecureCart.Cloudinary.CloudinaryService;
 import com.example.SecureCart.Exception.AddressNotFound;
 import com.example.SecureCart.Exception.UserNotFound;
+import com.example.SecureCart.Interface.AddressInterface;
+import com.example.SecureCart.Interface.EmailInterface;
 import com.example.SecureCart.Interface.ProfileInterface;
 import com.example.SecureCart.Mapper.ProfileMapper;
 import com.example.SecureCart.Repository.AddressRepository;
@@ -33,9 +35,9 @@ import lombok.extern.slf4j.Slf4j;
 public class ProfileService implements ProfileInterface{
 	
 	private final UserRepository userRepository;
-	private final AddressService addressService;
+	private final AddressInterface addressService;
 	private final ProfileMapper profileMapper;
-	private final EmailService emailService;
+	private final EmailInterface emailService;
 	private final CloudinaryService cloudinaryService;
 
 	
